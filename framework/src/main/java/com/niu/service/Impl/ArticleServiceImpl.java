@@ -7,6 +7,7 @@ import com.niu.constants.SystemConstants;
 import com.niu.domain.ResponseResult;
 import com.niu.domain.entity.Article;
 import com.niu.domain.entity.Category;
+import com.niu.domain.vo.ArticleDetailVo;
 import com.niu.domain.vo.ArticleListVo;
 import com.niu.domain.vo.HotArticleVo;
 import com.niu.domain.vo.PageVo;
@@ -14,14 +15,11 @@ import com.niu.mapper.ArticleMapper;
 import com.niu.service.ArticleService;
 import com.niu.service.CategoryService;
 import com.niu.utils.BeanCopyUtils;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
@@ -123,5 +121,29 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         PageVo pageVo = new PageVo(articleListVos,page.getTotal());
 
         return ResponseResult.okResult(pageVo);
+    }
+
+    /**
+     * 获得详细文章内容
+     * @param id
+     * @return
+     */
+    @Override
+    public ResponseResult getArticleDetail(Long id) {
+        // 根据id查询文章
+        Article article = getById(id);
+
+        // 转化成vo
+        ArticleDetailVo articleDetailVo = BeanCopyUtils.copyBean(article, ArticleDetailVo.class);
+
+        // 根据分类id,查询分类名
+        Long categoryId = articleDetailVo.getCategoryId();
+        Category category = categoryService.getById(categoryId);
+        if (category != null){
+            articleDetailVo.setCategoryName(category.getName());
+        }
+
+        // 封装相应返回
+        return ResponseResult.okResult(articleDetailVo);
     }
 }
