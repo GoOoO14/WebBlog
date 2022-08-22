@@ -4,11 +4,13 @@ import java.util.Date;
 
 import java.io.Serializable;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 import org.springframework.boot.convert.PeriodFormat;
 
 /**
@@ -22,6 +24,7 @@ import org.springframework.boot.convert.PeriodFormat;
 @AllArgsConstructor
 @NoArgsConstructor
 @TableName("sg_article")
+@Accessors(chain = true)
 public class Article {
 
     @TableId
@@ -34,6 +37,11 @@ public class Article {
     private String summary;
     //所属分类id
     private Long categoryId;
+
+    //所属分类name
+    @TableField(exist = false)      // 意思是这个字段在数据表中不存在
+    private String categoryName;
+
     //缩略图
     private String thumbnail;
     //是否置顶（0否，1是）
