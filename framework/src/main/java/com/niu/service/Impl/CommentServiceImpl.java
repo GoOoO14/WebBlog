@@ -3,6 +3,7 @@ package com.niu.service.Impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.niu.constants.SystemConstants;
 import com.niu.domain.ResponseResult;
 import com.niu.domain.entity.Comment;
 import com.niu.domain.vo.CommentVo;
@@ -13,9 +14,7 @@ import com.niu.mapper.CommentMapper;
 import com.niu.service.CommentService;
 import com.niu.service.UserService;
 import com.niu.utils.BeanCopyUtils;
-import com.niu.utils.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -35,14 +34,19 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
 
 
     @Override
-    public ResponseResult commentList(Long articleId, Integer pageNum, Integer pageSize) {
+    public ResponseResult commentList(String commentType, Long articleId, Integer pageNum, Integer pageSize) {
         // 查询对应文章的根评论
         LambdaQueryWrapper<Comment> queryWrapper = new LambdaQueryWrapper<>();
-        // 对articleId进行判断
-        queryWrapper.eq(Comment::getArticleId, articleId);
+
+        // 对articleId进行判断         这里的比较记得把常量写在前面,避免空指针异常
+        queryWrapper.eq(SystemConstants.ARTICLE_COMMENT.equals(commentType),Comment::getArticleId, articleId);
 
         // 根评论  rootId = -1
         queryWrapper.eq(Comment::getRootId, -1);
+
+        // 评论类型
+        queryWrapper.eq(Comment::getType, commentType);
+
 
         // 分页查询
         Page<Comment> page = new Page<>(pageNum, pageSize);
